@@ -20,6 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "netlify-lambda": "^2.0.14",
     "pg": "^8.7.1",
+    "pg-native": "^3.0.0",
     "serverless-http": "^2.7.0",
     "uuid": "^8.3.2"
   },
