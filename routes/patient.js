@@ -6,6 +6,7 @@ const {
   getAllPatients,
   updatePatient,
   deletePatient,
+  getPatient,
 } = require("../controllers/patient");
 
 router.get("/patients", getAllPatients);
@@ -13,6 +14,8 @@ router.get("/patients", getAllPatients);
 router.post("/patients", addPatient);
 
 router.put("/patient/:patientId", updatePatient);
+
+router.get("/patient/:patientId", getPatient);
 
 router.delete("/patient/:patientId", deletePatient);
 

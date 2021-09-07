@@ -19,4 +19,6 @@ CREATE TABLE patients (
 );
 
 INSERT INTO users (firstname,lastname,nickname) VALUES ('a','b','asdasd');
+INSERT INTO patients (firstname,lastname,nickname,user_info,address,phone_number) VALUES ('aaa','bvbbbb','ccc','dont know','asda23231 3jijad 2312','0111111111');
+
 SELECT * FROM users ;
