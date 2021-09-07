@@ -29,7 +29,7 @@ exports.addPatient = async (req, res) => {
 
 exports.getAllPatients = async (req, res) => {
   try {
-    const results = await db.query("SELECT * FROM patients");
+    const results = await db.query("SELECT * FROM patients ORDER BY id");
     return res.json({
       status: "success",
       data: {
@@ -98,6 +98,25 @@ exports.deletePatient = async (req, res) => {
     if (!process.env.PRODUCTION) console.log(e);
     return res.status(400).json({
       error: "Failed to delete the patient",
+    });
+  }
+};
+
+exports.getPatient = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const results = await db.query("SELECT * FROM patients WHERE id=$1", [
+      patientId,
+    ]);
+    return res.json({
+      status: "success",
+      data: {
+        patient: results.rows[0],
+      },
+    });
+  } catch (e) {
+    return res.status(400).json({
+      error: "No patient found",
     });
   }
 };
