@@ -1,10 +1,11 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const { isSignedIn } = require("./middlewares/auth");
 const app = express();
-
 // Middlewares
 app.use(express.json());
+app.use(cors());
 // Routes
 const authRoutes = require("./routes/auth");
 const patientRoutes = require("./routes/patient");
