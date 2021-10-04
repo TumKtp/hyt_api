@@ -1,15 +1,7 @@
 const jwt = require("jsonwebtoken");
-const CryptoJS = require("crypto-js");
 const { v4: uuidv4 } = require("uuid");
 const db = require("../db");
-
-const securePassword = (password, salt) => {
-  const sha256 = CryptoJS.algo.SHA256.create();
-  sha256.update(password, "utf-8");
-  sha256.update(CryptoJS.SHA256(salt), "utf-8");
-  const hash = sha256.finalize().toString();
-  return hash;
-};
+const { securePassword } = require("../helpers/authHelper");
 
 exports.signup = async (req, res) => {
   try {

@@ -9,9 +9,13 @@ app.use(cors());
 // Routes
 const authRoutes = require("./routes/auth");
 const patientRoutes = require("./routes/patient");
+const userRoutes = require("./routes/user");
+const productRoutes = require("./routes/product");
 
 app.use("/api", authRoutes);
 app.use("/api", isSignedIn, patientRoutes);
+app.use("/api", userRoutes);
+app.use("/api", productRoutes);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
