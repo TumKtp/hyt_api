@@ -5,12 +5,14 @@ const { securePassword } = require("../helpers/authHelper");
 
 exports.signup = async (req, res) => {
   try {
-    const { username, password, detail, role } = req.body;
+    const { username, password, detail, role, branch_id } = req.body;
     const salt = uuidv4();
     const encryptedPassword = securePassword(password, salt);
     const results = await db.query(
-      "INSERT INTO users (username,encry_password,salt,detail,role) VALUES ($1,$2,$3,$4,$5)",
-      [username, encryptedPassword, salt, detail, role]
+      "INSERT INTO user_account (username,encry_password,salt,detail,role,branch_id) VALUES ($1,$2,$3,$4,$5,$6)",
+      [username, encryptedPassword, salt, detail, role, branch_id].map((v) =>
+        v === "" ? null : v
+      )
     );
     return res.json({
       status: "success",
@@ -34,15 +36,17 @@ exports.signup = async (req, res) => {
 exports.signin = async (req, res) => {
   try {
     const { username, password } = req.body;
-    const results = await db.query("SELECT * FROM users WHERE username=$1", [
-      username,
-    ]);
+    const results = await db.query(
+      "SELECT * FROM user_account WHERE username=$1",
+      [username].map((v) => (v === "" ? null : v))
+    );
     const {
       salt,
       encry_password: encryptedPassword,
       detail,
       role,
       id,
+      branch_id,
     } = results.rows[0];
 
     if (securePassword(password, salt) !== encryptedPassword) {
@@ -51,10 +55,14 @@ exports.signin = async (req, res) => {
     }
 
     // Create token
-    const token = jwt.sign({ username, id }, process.env.SECRET, {
-      algorithm: "HS256",
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { username, id, role, branch_id },
+      process.env.SECRET,
+      {
+        algorithm: "HS256",
+        expiresIn: "7d",
+      }
+    );
     // Send response to front end
     return res.json({
       status: "success",
@@ -63,6 +71,8 @@ exports.signin = async (req, res) => {
         username,
         detail,
         role,
+        branch_id,
+        id,
       },
     });
   } catch (e) {
