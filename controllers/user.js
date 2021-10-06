@@ -6,8 +6,8 @@ exports.getUser = async (req, res) => {
   try {
     const { userId } = req.params;
     const results = await db.query(
-      "SELECT id,username,detail,role FROM users WHERE id=$1",
-      [userId]
+      "SELECT id,username,detail,role,branch_id FROM user_account WHERE id=$1",
+      [userId].map((v) => (v === "" ? null : v))
     );
     return res.json({
       status: "success",
@@ -25,7 +25,7 @@ exports.getUser = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const results = await db.query(
-      "SELECT id,username,detail,role FROM users ORDER BY role"
+      "SELECT user_account.id,user_account.username,user_account.detail,user_account.role,branch.name as branch_name FROM user_account LEFT JOIN branch ON user_account.branch_id = branch.id ORDER BY role"
     );
     return res.json({
       status: "success",
@@ -43,12 +43,14 @@ exports.getAllUsers = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { username, password, detail, role } = req.body;
+    const { username, password, detail, role, branch_id } = req.body;
     const salt = uuidv4();
     const encryptedPassword = securePassword(password, salt);
     const results = await db.query(
-      "UPDATE users SET username=$1,encry_password=$2,salt=$3,detail=$4,role=$5 WHERE id=$6",
-      [username, encryptedPassword, salt, detail, role, userId]
+      "UPDATE user_account SET username=$1,encry_password=$2,salt=$3,detail=$4,role=$5,branch_id=$6 WHERE id=$7",
+      [username, encryptedPassword, salt, detail, role, branch_id, userId].map(
+        (v) => (v === "" ? null : v)
+      )
     );
     return res.json({
       status: "success",
@@ -56,6 +58,7 @@ exports.updateUser = async (req, res) => {
         username,
         detail,
         role,
+        branch_id,
       },
     });
   } catch (e) {
@@ -72,7 +75,10 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const results = await db.query("DELETE FROM users WHERE id=$1", [userId]);
+    const results = await db.query(
+      "DELETE FROM user_account WHERE id=$1",
+      [userId].map((v) => (v === "" ? null : v))
+    );
     return res.json({
       status: "success",
       data: {

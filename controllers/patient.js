@@ -2,11 +2,27 @@ const db = require("../db");
 
 exports.addPatient = async (req, res) => {
   try {
-    const { firstname, lastname, nickname, user_info, address, phone_number } =
-      req.body;
+    const {
+      firstname,
+      lastname,
+      nickname,
+      user_info,
+      address,
+      phone_number,
+      gender,
+    } = req.body;
     const results = await db.query(
-      "INSERT INTO patients (firstname,lastname,nickname,user_info,address,phone_number) VALUES ($1,$2,$3,$4,$5,$6)",
-      [firstname, lastname, nickname, user_info, address, phone_number]
+      "INSERT INTO patient (firstname,lastname,nickname,user_info,address,phone_number,gender,user_account_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+      [
+        firstname,
+        lastname,
+        nickname,
+        user_info,
+        address,
+        phone_number,
+        gender,
+        req.auth.id,
+      ].map((v) => (v === "" ? null : v))
     );
     return res.json({
       status: "success",
@@ -17,6 +33,7 @@ exports.addPatient = async (req, res) => {
         user_info,
         address,
         phone_number,
+        gender,
       },
     });
   } catch (e) {
@@ -29,7 +46,9 @@ exports.addPatient = async (req, res) => {
 
 exports.getAllPatients = async (req, res) => {
   try {
-    const results = await db.query("SELECT * FROM patients ORDER BY id");
+    const results = await db.query(
+      "SELECT patient.*,user_account.username FROM patient LEFT JOIN user_account ON user_account.id = patient.user_account_id ORDER BY id"
+    );
     return res.json({
       status: "success",
       data: {
@@ -37,7 +56,6 @@ exports.getAllPatients = async (req, res) => {
       },
     });
   } catch (e) {
-    console.log(e);
     return res.status(400).json({
       error: "No patient found",
     });
@@ -47,11 +65,17 @@ exports.getAllPatients = async (req, res) => {
 exports.updatePatient = async (req, res) => {
   try {
     const { patientId } = req.params;
-    const { firstname, lastname, nickname, user_info, address, phone_number } =
-      req.body;
-    console.log(patientId);
+    const {
+      firstname,
+      lastname,
+      nickname,
+      user_info,
+      address,
+      phone_number,
+      gender,
+    } = req.body;
     const results = await db.query(
-      "UPDATE patients SET firstname=$1,lastname=$2,nickname=$3,user_info=$4,address=$5,phone_number=$6 WHERE id=$7",
+      "UPDATE patient SET firstname=$1,lastname=$2,nickname=$3,user_info=$4,address=$5,phone_number=$6,gender=$7 WHERE id=$8",
       [
         firstname,
         lastname,
@@ -59,8 +83,9 @@ exports.updatePatient = async (req, res) => {
         user_info,
         address,
         phone_number,
+        gender,
         patientId,
-      ]
+      ].map((v) => (v === "" ? null : v))
     );
     return res.json({
       status: "success",
@@ -71,6 +96,7 @@ exports.updatePatient = async (req, res) => {
         user_info,
         address,
         phone_number,
+        gender,
         patientId,
       },
     });
@@ -85,9 +111,10 @@ exports.updatePatient = async (req, res) => {
 exports.deletePatient = async (req, res) => {
   try {
     const { patientId } = req.params;
-    const results = await db.query("DELETE FROM patients WHERE id=$1", [
-      patientId,
-    ]);
+    const results = await db.query(
+      "DELETE FROM patient WHERE id=$1",
+      [patientId].map((v) => (v === "" ? null : v))
+    );
     return res.json({
       status: "success",
       data: {
@@ -105,9 +132,10 @@ exports.deletePatient = async (req, res) => {
 exports.getPatient = async (req, res) => {
   try {
     const { patientId } = req.params;
-    const results = await db.query("SELECT * FROM patients WHERE id=$1", [
-      patientId,
-    ]);
+    const results = await db.query(
+      "SELECT * FROM patient WHERE id=$1",
+      [patientId].map((v) => (v === "" ? null : v))
+    );
     return res.json({
       status: "success",
       data: {
