@@ -1,5 +1,6 @@
 const db = require("../db");
 const { securePassword } = require("../helpers/authHelper");
+const { hasWhiteSpace } = require("../helpers/textHelper");
 const { v4: uuidv4 } = require("uuid");
 
 exports.getUser = async (req, res) => {
@@ -44,6 +45,9 @@ exports.updateUser = async (req, res) => {
   try {
     const { userId } = req.params;
     const { username, password, detail, role, branch_id } = req.body;
+    if (hasWhiteSpace(password)) throw "Password can't contain space";
+    if (password.length < 8) throw "Password must be at least 8 characters";
+
     const salt = uuidv4();
     const encryptedPassword = securePassword(password, salt);
     const results = await db.query(

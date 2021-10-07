@@ -2,10 +2,14 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const db = require("../db");
 const { securePassword } = require("../helpers/authHelper");
+const { hasWhiteSpace } = require("../helpers/textHelper");
 
 exports.signup = async (req, res) => {
   try {
     const { username, password, detail, role, branch_id } = req.body;
+    if (hasWhiteSpace(password)) throw "Password can't contain space";
+    if (password.length < 8) throw "Password must be at least 8 characters";
+
     const salt = uuidv4();
     const encryptedPassword = securePassword(password, salt);
     const results = await db.query(
