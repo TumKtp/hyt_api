@@ -6,12 +6,13 @@ const {
   updateUser,
   deleteUser,
 } = require("../controllers/user");
+const { isSignedIn, isOwner } = require("../middlewares/auth");
 
-router.get("/users/:userId", getUser);
-router.get("/users", getAllUsers);
+router.get("/users/:userId", isSignedIn, isOwner, getUser);
+router.get("/users", isSignedIn, isOwner, getAllUsers);
 
-router.put("/users/:userId", updateUser);
+router.put("/users/:userId", isSignedIn, isOwner, updateUser);
 
-router.delete("/users/:userId", deleteUser);
+router.delete("/users/:userId", isSignedIn, isOwner, deleteUser);
 
 module.exports = router;

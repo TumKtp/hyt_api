@@ -6,15 +6,16 @@ const {
   updateProduct,
   deleteProduct,
 } = require("../controllers/product");
+const { isSignedIn, isOwner } = require("../middlewares/auth");
 const router = express.Router();
 
-router.post("/products", addProduct);
+router.post("/products", isSignedIn, isOwner, addProduct);
 
-router.get("/products/:productId", getProduct);
-router.get("/products", getAllProducts);
+router.get("/products/:productId", isSignedIn, getProduct);
+router.get("/products", isSignedIn, getAllProducts);
 
-router.put("/products/:productId", updateProduct);
+router.put("/products/:productId", isSignedIn, isOwner, updateProduct);
 
-router.delete("/products/:productId", deleteProduct);
+router.delete("/products/:productId", isSignedIn, isOwner, deleteProduct);
 
 module.exports = router;
