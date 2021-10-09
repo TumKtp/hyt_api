@@ -1,11 +1,19 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const { isSignedIn } = require("./middlewares/auth");
 const app = express();
 // Middlewares
 app.use(express.json());
-app.use(cors());
+if (process.env.PRODUCTION)
+  app.use(
+    cors({
+      origin: ["https://portal.huayitangtcmclinic.com"],
+    })
+  );
+else app.use(cors());
+app.use(helmet());
 // Routes
 const authRoutes = require("./routes/auth");
 const patientRoutes = require("./routes/patient");

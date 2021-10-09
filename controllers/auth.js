@@ -90,6 +90,15 @@ exports.signin = async (req, res) => {
   }
 };
 
+exports.role = (req, res) => {
+  return res.json({
+    status: "success",
+    data: {
+      role: req.auth.role,
+    },
+  });
+};
+
 exports.signout = (_, res) => {
   console.log("Clear token from cookie");
   res.clearCookie("token");
